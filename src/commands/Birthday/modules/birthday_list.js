@@ -15,8 +15,8 @@ export default {
         if (sortedBirthdays.length === 0) {
             const embed = new EmbedBuilder()
                 .setColor(0xFF0000)
-                .setTitle('No Birthdays')
-                .setDescription('No birthdays have been set in this server yet.');
+                .setTitle("Aucun anniversaire")
+                .setDescription("Aucun anniversaire n'a encore été enregistré sur ce serveur.");
             return await InteractionHelper.safeEditReply(interaction, {
                 embeds: [embed]
             });
@@ -35,7 +35,7 @@ export default {
                 continue;
             }
             displayIndex++;
-            birthdayList += `${displayIndex}. <@${birthday.userId}> - ${birthday.monthName} ${birthday.day}\n`;
+            birthdayList += `${displayIndex}. <@${birthday.userId}> - ${birthday.day} ${birthday.monthName}\n`;
         }
 
         if (fetchedMembers && staleUserIds.length > 0) {
@@ -47,19 +47,19 @@ export default {
         if (displayIndex === 0) {
             const embed = new EmbedBuilder()
                 .setColor(0xFF0000)
-                .setTitle('No Birthdays')
-                .setDescription('No birthdays have been set by current server members.');
+                .setTitle("Aucun anniversaire")
+                .setDescription("Aucun anniversaire n'a été défini par les membres actuels du serveur.");
             return await InteractionHelper.safeEditReply(interaction, {
                 embeds: [embed]
             });
         }
 
-        birthdayList = `**${displayIndex} birthday${displayIndex !== 1 ? 's' : ''} in ${interaction.guild.name}**\n\n` + birthdayList;
+        birthdayList = `**${displayIndex} anniversaire${displayIndex > 1 ? 's' : ''} sur ${interaction.guild.name}**\n\n` + birthdayList;
 
         const embed = new EmbedBuilder()
             .setColor(0x00FF00)
-            .setTitle('Server Birthdays')
-            .setDescription(`${birthdayList}\n\nTotal: ${displayIndex} birthday${displayIndex !== 1 ? 's' : ''}`);
+            .setTitle("Anniversaires du serveur")
+            .setDescription(`${birthdayList}\n\nTotal : ${displayIndex} anniversaire${displayIndex > 1 ? 's' : ''}`);
 
         await InteractionHelper.safeEditReply(interaction, {
             embeds: [embed]
