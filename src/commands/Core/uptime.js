@@ -6,7 +6,7 @@ import { InteractionHelper } from '../../utils/interactionHelper.js';
 export default {
     data: new SlashCommandBuilder()
     .setName("uptime")
-    .setDescription("Check how long the bot has been online"),
+    .setDescription("Vérifie depuis combien de temps le bot est en ligne"),
 
   async execute(interaction) {
     try {
@@ -20,24 +20,24 @@ export default {
       let minutes = Math.floor(totalSeconds / 60);
       let seconds = Math.floor(totalSeconds % 60);
 
-      const uptimeStr = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      const uptimeStr = `${days}j ${hours}h ${minutes}m ${seconds}s`;
 
       await InteractionHelper.safeEditReply(interaction, {
         embeds: [createEmbed({ 
-          title: "System Uptime", 
+          title: "Temps de fonctionnement du système", 
           description: `\`\`\`${uptimeStr}\`\`\`` 
         })],
       });
     } catch (error) {
-      logger.error('Uptime command error:', error);
+      logger.error("Erreur de la commande uptime :", error);
       
       try {
         return await InteractionHelper.safeEditReply(interaction, {
-          embeds: [createEmbed({ title: 'System Error', description: 'Could not compute uptime.', color: 'error' })],
+          embeds: [createEmbed({ title: 'Erreur système', description: "Impossible de calculer le temps de fonctionnement.", color: 'error' })],
           flags: MessageFlags.Ephemeral,
         });
       } catch (replyError) {
-        logger.error('Failed to send error reply:', replyError);
+        logger.error("Échec de l'envoi de la réponse d'erreur :", replyError);
       }
     }
   },
