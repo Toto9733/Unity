@@ -161,11 +161,11 @@ export const botConfig = {
   economy: {
     currency: {
       // Currency display name.
-      name: "coins",
+      name: "pièces",
       // Plural display name.
-      namePlural: "coins",
+      namePlural: "pièces",
       // Currency symbol shown in balances.
-      symbol: "$",
+      symbol: "🪙",
     },
 
     // Starting balance for new users.
@@ -302,10 +302,10 @@ export const botConfig = {
   // =========================
   verification: {
     // Message shown when posting the verification panel.
-    defaultMessage: "Click the button below to verify yourself and gain access to the server!",
+    defaultMessage: "Clique sur le bouton ci-dessous pour te vérifier et accéder au serveur !",
 
     // Text on the verification button.
-    defaultButtonText: "Verify",
+    defaultButtonText: "Vérifier",
 
     // Automatic verification behavior.
     autoVerify: {
@@ -372,11 +372,11 @@ export const botConfig = {
     // Welcome template posted when a user joins.
     // Placeholders: {user}, {server}, {memberCount}
     defaultWelcomeMessage:
-      "Welcome {user} to {server}! We now have {memberCount} members!",
+      "{user} Bienvenue bby",
     // Goodbye template posted when a user leaves.
     // Placeholders: {user}, {memberCount}
     defaultGoodbyeMessage:
-      "{user} has left the server. We now have {memberCount} members.",
+      "{user} a quitter le serveur. Nous sommes maintenant {memberCount} membres.",
     // Channel ID for welcome messages.
     defaultWelcomeChannel: null,
     // Channel ID for goodbye messages.
@@ -412,7 +412,7 @@ export const botConfig = {
       // Built-in counter types and how each count is calculated.
       members: {
         name: "👥 Members",
-        description: "Total members in the server",
+        description: "Total de membres sur le serveur",
         getCount: (guild) => guild.memberCount.toString(),
       },
       bots: {
@@ -434,13 +434,13 @@ export const botConfig = {
   // GENERIC BOT MESSAGES
   // =========================
   messages: {
-    noPermission: "You do not have permission to use this command.",
-    cooldownActive: "Please wait {time} before using this command again.",
-    errorOccurred: "An error occurred while executing this command.",
+    noPermission: "Tu n'as pas la permission d'utiliser cette commande.",
+    cooldownActive: "Veuillez patienter {time} avant de réutiliser cette commande.",
+    errorOccurred: "Une erreur est survenue lors de l'exécution de cette commande.",
     missingPermissions:
-      "I am missing required permissions to perform this action.",
-    commandDisabled: "This command has been disabled.",
-    maintenanceMode: "The bot is currently in maintenance mode.",
+      "Il me manque les permissions requises pour effectuer cette action.",
+    commandDisabled: "Cette commande a été désactivée.",
+    maintenanceMode: "Le bot est actuellement en mode maintenance.",
   },
 
   // =========================
