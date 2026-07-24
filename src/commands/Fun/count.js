@@ -1,4 +1,5 @@
 
+
 import { SlashCommandBuilder, PermissionFlagsBits, ChannelType, MessageFlags } from 'discord.js';
 import { createEmbed, successEmbed, infoEmbed } from '../../utils/embeds.js';
 import { InteractionHelper } from '../../utils/interactionHelper.js';
@@ -13,8 +14,8 @@ import {
     getExpectedCountValue,
 } from '../../services/countingGameService.js';
 import { logger } from '../../utils/logger.js';
-
 import { replyUserError, ErrorTypes } from '../../utils/errorHandler.js';
+
 export default {
     data: new SlashCommandBuilder()
         .setName('count')
@@ -170,10 +171,8 @@ export default {
 
             return await replyUserError(interaction, { type: ErrorTypes.VALIDATION, message: 'Veuillez choisir une action valide pour le jeu de comptage.' });
         } catch (error) {
-            logger.error('Erreur de la commande count :', error);
+            logger.error('Erreur lors de la gestion de la commande count :', error);
             return await replyUserError(interaction, { type: ErrorTypes.UNKNOWN, message: 'Une erreur est survenue lors de la gestion du jeu de comptage.' });
         }
     },
 };
-
-
