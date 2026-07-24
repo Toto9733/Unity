@@ -17,7 +17,7 @@ export function getXpForLevel(level) {
     throw new TitanBotError(
       `Invalid level: ${level}. Must be between ${MIN_LEVEL} and ${MAX_LEVEL}`,
       ErrorTypes.VALIDATION,
-      'The level must be a valid number.'
+      'Le niveau doit être un nombre valide.'
     );
   }
   return 5 * Math.pow(level, 2) + 50 * level + 50;
@@ -28,7 +28,7 @@ export function getLevelFromXp(xp) {
     throw new TitanBotError(
       `Invalid XP: ${xp}`,
       ErrorTypes.VALIDATION,
-      'XP must be a non-negative number.'
+      "L'XP doit être un nombre positif ou nul."
     );
   }
 
@@ -58,12 +58,11 @@ export function calculateTotalXp(level, currentXp = 0) {
 
 export async function getLeaderboard(client, guildId, limit = 10) {
   try {
-    
     if (!guildId || typeof guildId !== 'string') {
       throw new TitanBotError(
         'Invalid guild ID',
         ErrorTypes.VALIDATION,
-        'Guild ID is required.'
+        "L'ID du serveur est requis."
       );
     }
 
@@ -73,12 +72,12 @@ export async function getLeaderboard(client, guildId, limit = 10) {
 
     const guild = client.guilds.cache.get(guildId);
     if (!guild) {
-      logger.warn(`Guild ${guildId} not found in cache`);
+      logger.warn(`Serveur ${guildId} introuvable dans le cache`);
       return [];
     }
     
     const members = await guild.members.fetch().catch(error => {
-      logger.error(`Failed to fetch members for guild ${guildId}:`, error);
+      logger.error(`Échec de la récupération des membres pour le serveur ${guildId} :`, error);
       return new Map();
     });
 
@@ -107,24 +106,24 @@ export async function getLeaderboard(client, guildId, limit = 10) {
     return leaderboard.slice(0, limit);
     
   } catch (error) {
-    logger.error('Error getting leaderboard:', error);
+    logger.error('Erreur lors de la récupération du classement :', error);
     if (error instanceof TitanBotError) throw error;
     throw new TitanBotError(
-      `Failed to fetch leaderboard: ${error.message}`,
+      `Échec de la récupération du classement : ${error.message}`,
       ErrorTypes.DATABASE,
-      'Could not fetch the leaderboard at this time.'
+      'Impossible de récupérer le classement pour le moment.'
     );
   }
 }
 
 export function createLeaderboardEmbed(leaderboard, guild) {
   const embed = new EmbedBuilder()
-    .setTitle(`🏆 ${guild.name} Leaderboard`)
+    .setTitle(`🏆 Classement de ${guild.name}`)
     .setColor('#2ecc71')
     .setTimestamp();
     
   if (!leaderboard || leaderboard.length === 0) {
-    embed.setDescription('No users on the leaderboard yet!');
+    embed.setDescription("Aucun utilisateur dans le classement pour le moment !");
     return embed;
   }
   
@@ -133,15 +132,15 @@ export function createLeaderboardEmbed(leaderboard, guild) {
   
   const top3Text = top3.map((user, index) => {
     const medal = ['🥇', '🥈', '🥉'][index];
-    return `${medal} **#${user.rank}** ${user.username} - Level ${user.level} (${user.totalXp} XP)`;
+    return `${medal} **#${user.rank}** ${user.username} - Niveau ${user.level} (${user.totalXp} XP)`;
   }).join('\n');
   
   const restText = rest.map(user => {
-    return `**#${user.rank}** ${user.username} - Level ${user.level} (${user.totalXp} XP)`;
+    return `**#${user.rank}** ${user.username} - Niveau ${user.level} (${user.totalXp} XP)`;
   }).join('\n');
   
   embed.setDescription(
-    `**Top Members**\n${top3Text}${restText ? '\n\n' + restText : ''}`
+    `**Meilleurs membres**\n${top3Text}${restText ? '\n\n' + restText : ''}`
   );
   
   return embed;
@@ -154,7 +153,7 @@ export async function getLevelingConfig(client, guildId) {
       enabled: true,
       xpPerMessage: { min: 15, max: 25 },
       xpCooldown: 20,
-      levelUpMessage: '{user} has leveled up to level {level}!',
+      levelUpMessage: '{user} est passé au niveau {level} !',
       levelUpChannel: null,
       ignoredChannels: [],
       ignoredRoles: [],
@@ -164,12 +163,12 @@ export async function getLevelingConfig(client, guildId) {
       xpMultiplier: 1
     };
   } catch (error) {
-    logger.error(`Error getting leveling config for guild ${guildId}:`, error);
+    logger.error(`Erreur lors de la récupération de la configuration des niveaux pour le serveur ${guildId} :`, error);
     return {
       enabled: true,
       xpPerMessage: { min: 15, max: 25 },
       xpCooldown: 20,
-      levelUpMessage: '{user} has leveled up to level {level}!',
+      levelUpMessage: '{user} est passé au niveau {level} !',
       levelUpChannel: null,
       ignoredChannels: [],
       ignoredRoles: [],
@@ -185,7 +184,7 @@ export async function getUserLevelData(client, guildId, userId) {
   try {
     if (!guildId || !userId) {
       throw new TitanBotError(
-        'Guild ID and User ID are required',
+        "L'ID du serveur et l'ID de l'utilisateur sont requis",
         ErrorTypes.VALIDATION
       );
     }
@@ -211,12 +210,12 @@ export async function getUserLevelData(client, guildId, userId) {
       rank: data.rank || 0
     };
   } catch (error) {
-    logger.error(`Error getting user level data for ${userId}:`, error);
+    logger.error(`Erreur lors de la récupération des données de niveau de l'utilisateur ${userId} :`, error);
     if (error instanceof TitanBotError) throw error;
     throw new TitanBotError(
-      `Failed to fetch user data: ${error.message}`,
+      `Échec de la récupération des données utilisateur : ${error.message}`,
       ErrorTypes.DATABASE,
-      'Could not fetch level data at this time.'
+      'Impossible de récupérer les données de niveau pour le moment.'
     );
   }
 }
@@ -225,14 +224,14 @@ export async function saveUserLevelData(client, guildId, userId, data) {
   try {
     if (!guildId || !userId) {
       throw new TitanBotError(
-        'Guild ID and User ID are required',
+        "L'ID du serveur et l'ID de l'utilisateur sont requis",
         ErrorTypes.VALIDATION
       );
     }
 
     if (!data || typeof data !== 'object') {
       throw new TitanBotError(
-        'Invalid user level data',
+        'Données de niveau utilisateur invalides',
         ErrorTypes.VALIDATION
       );
     }
@@ -248,12 +247,12 @@ export async function saveUserLevelData(client, guildId, userId, data) {
     const key = getUserLevelKey(guildId, userId);
     await client.db.set(key, sanitizedData);
   } catch (error) {
-    logger.error(`Error saving user level data for ${userId}:`, error);
+    logger.error(`Erreur lors de la sauvegarde des données de niveau de l'utilisateur ${userId} :`, error);
     if (error instanceof TitanBotError) throw error;
     throw new TitanBotError(
-      `Failed to save user data: ${error.message}`,
+      `Échec de la sauvegarde des données utilisateur : ${error.message}`,
       ErrorTypes.DATABASE,
-      'Could not save level data at this time.'
+      'Impossible de sauvegarder les données de niveau pour le moment.'
     );
   }
 }
@@ -262,7 +261,7 @@ export async function saveLevelingConfig(client, guildId, config) {
   try {
     if (!guildId || !config) {
       throw new TitanBotError(
-        'Guild ID and config are required',
+        "L'ID du serveur et la configuration sont requis",
         ErrorTypes.VALIDATION
       );
     }
@@ -271,31 +270,31 @@ export async function saveLevelingConfig(client, guildId, config) {
 
     if (config.xpCooldown && (config.xpCooldown < 0 || config.xpCooldown > 3600)) {
       throw new TitanBotError(
-        'XP cooldown must be between 0 and 3600 seconds',
+        "Le délai d'attente XP doit être compris entre 0 et 3600 secondes",
         ErrorTypes.VALIDATION,
-        'Cooldown must be between 0 and 3600 seconds.'
+        'Le délai doit être compris entre 0 et 3600 secondes.'
       );
     }
 
     if (config.xpRange && (config.xpRange.min < 1 || config.xpRange.max < 1 || config.xpRange.min > config.xpRange.max)) {
       throw new TitanBotError(
-        'Invalid XP range configuration',
+        'Configuration de la plage XP invalide',
         ErrorTypes.VALIDATION,
-        'Minimum XP must be less than maximum XP, and both must be positive.'
+        "L'XP minimum doit être inférieure à l'XP maximum, et les deux doivent être positifs."
       );
     }
 
     guildConfig.leveling = config;
     await setGuildConfig(client, guildId, guildConfig);
     
-    logger.info(`Leveling config updated for guild ${guildId}`);
+    logger.info(`Configuration des niveaux mise à jour pour le serveur ${guildId}`);
   } catch (error) {
-    logger.error(`Error saving leveling config for guild ${guildId}:`, error);
+    logger.error(`Erreur lors de la sauvegarde de la configuration des niveaux pour le serveur ${guildId} :`, error);
     if (error instanceof TitanBotError) throw error;
     throw new TitanBotError(
-      `Failed to save config: ${error.message}`,
+      `Échec de la sauvegarde de la configuration : ${error.message}`,
       ErrorTypes.DATABASE,
-      'Could not save configuration at this time.'
+      'Impossible de sauvegarder la configuration pour le moment.'
     );
   }
 }
@@ -305,17 +304,17 @@ export async function addLevels(client, guildId, userId, levels) {
     const levelingConfig = await getLevelingConfig(client, guildId);
     if (!levelingConfig?.enabled) {
       throw new TitanBotError(
-        'Leveling system is disabled on this server',
+        'Le système de niveaux est désactivé sur ce serveur',
         ErrorTypes.CONFIGURATION,
-        'The leveling system is currently disabled on this server.'
+        'Le système de niveaux est actuellement désactivé sur ce serveur.'
       );
     }
 
     if (!Number.isInteger(levels) || levels <= 0) {
       throw new TitanBotError(
-        `Invalid level amount: ${levels}`,
+        `Nombre de niveaux invalide : ${levels}`,
         ErrorTypes.VALIDATION,
-        'You must add a positive number of levels.'
+        'Vous devez ajouter un nombre positif de niveaux.'
       );
     }
 
@@ -324,9 +323,9 @@ export async function addLevels(client, guildId, userId, levels) {
 
     if (newLevel > MAX_LEVEL) {
       throw new TitanBotError(
-        `Level ${newLevel} exceeds maximum level ${MAX_LEVEL}`,
+        `Le niveau ${newLevel} dépasse le niveau maximum ${MAX_LEVEL}`,
         ErrorTypes.VALIDATION,
-        `Maximum level is ${MAX_LEVEL}.`
+        `Le niveau maximum est ${MAX_LEVEL}.`
       );
     }
 
@@ -339,15 +338,15 @@ export async function addLevels(client, guildId, userId, levels) {
 
     await saveUserLevelData(client, guildId, userId, userData);
     
-    logger.info(`Added ${levels} levels to user ${userId} in guild ${guildId}`);
+    logger.info(`${levels} niveau(x) ajouté(s) à l'utilisateur ${userId} sur le serveur ${guildId}`);
     return userData;
   } catch (error) {
-    logger.error(`Error adding levels for user ${userId}:`, error);
+    logger.error(`Erreur lors de l'ajout de niveaux pour l'utilisateur ${userId} :`, error);
     if (error instanceof TitanBotError) throw error;
     throw new TitanBotError(
-      `Failed to add levels: ${error.message}`,
+      `Échec de l'ajout de niveaux : ${error.message}`,
       ErrorTypes.DATABASE,
-      'Could not add levels at this time.'
+      "Impossible d'ajouter des niveaux pour le moment."
     );
   }
 }
@@ -357,17 +356,17 @@ export async function removeLevels(client, guildId, userId, levels) {
     const levelingConfig = await getLevelingConfig(client, guildId);
     if (!levelingConfig?.enabled) {
       throw new TitanBotError(
-        'Leveling system is disabled on this server',
+        'Le système de niveaux est désactivé sur ce serveur',
         ErrorTypes.CONFIGURATION,
-        'The leveling system is currently disabled on this server.'
+        'Le système de niveaux est actuellement désactivé sur ce serveur.'
       );
     }
 
     if (!Number.isInteger(levels) || levels <= 0) {
       throw new TitanBotError(
-        `Invalid level amount: ${levels}`,
+        `Nombre de niveaux invalide : ${levels}`,
         ErrorTypes.VALIDATION,
-        'You must remove a positive number of levels.'
+        'Vous devez retirer un nombre positif de niveaux.'
       );
     }
 
@@ -383,15 +382,15 @@ export async function removeLevels(client, guildId, userId, levels) {
 
     await saveUserLevelData(client, guildId, userId, userData);
     
-    logger.info(`Removed ${levels} levels from user ${userId} in guild ${guildId}`);
+    logger.info(`${levels} niveau(x) retiré(s) à l'utilisateur ${userId} sur le serveur ${guildId}`);
     return userData;
   } catch (error) {
-    logger.error(`Error removing levels for user ${userId}:`, error);
+    logger.error(`Erreur lors du retrait de niveaux pour l'utilisateur ${userId} :`, error);
     if (error instanceof TitanBotError) throw error;
     throw new TitanBotError(
-      `Failed to remove levels: ${error.message}`,
+      `Échec du retrait de niveaux : ${error.message}`,
       ErrorTypes.DATABASE,
-      'Could not remove levels at this time.'
+      'Impossible de retirer des niveaux pour le moment.'
     );
   }
 }
@@ -401,17 +400,17 @@ export async function setUserLevel(client, guildId, userId, level) {
     const levelingConfig = await getLevelingConfig(client, guildId);
     if (!levelingConfig?.enabled) {
       throw new TitanBotError(
-        'Leveling system is disabled on this server',
+        'Le système de niveaux est désactivé sur ce serveur',
         ErrorTypes.CONFIGURATION,
-        'The leveling system is currently disabled on this server.'
+        'Le système de niveaux est actuellement désactivé sur ce serveur.'
       );
     }
 
     if (!Number.isInteger(level) || level < MIN_LEVEL || level > MAX_LEVEL) {
       throw new TitanBotError(
-        `Invalid level: ${level}`,
+        `Niveau invalide : ${level}`,
         ErrorTypes.VALIDATION,
-        `Level must be between ${MIN_LEVEL} and ${MAX_LEVEL}.`
+        `Le niveau doit être compris entre ${MIN_LEVEL} et ${MAX_LEVEL}.`
       );
     }
 
@@ -426,15 +425,15 @@ export async function setUserLevel(client, guildId, userId, level) {
 
     await saveUserLevelData(client, guildId, userId, userData);
     
-    logger.info(`Set level for user ${userId} to ${level} in guild ${guildId}`);
+    logger.info(`Niveau défini à ${level} pour l'utilisateur ${userId} sur le serveur ${guildId}`);
     return userData;
   } catch (error) {
-    logger.error(`Error setting level for user ${userId}:`, error);
+    logger.error(`Erreur lors de la définition du niveau pour l'utilisateur ${userId} :`, error);
     if (error instanceof TitanBotError) throw error;
     throw new TitanBotError(
-      `Failed to set level: ${error.message}`,
+      `Échec de la définition du niveau : ${error.message}`,
       ErrorTypes.DATABASE,
-      'Could not set level at this time.'
+      'Impossible de définir le niveau pour le moment.'
     );
   }
 }
@@ -443,7 +442,7 @@ export async function deleteUserLevelData(client, guildId, userId) {
   try {
     if (!guildId || !userId) {
       throw new TitanBotError(
-        'Guild ID and User ID are required',
+        "L'ID du serveur et l'ID de l'utilisateur sont requis",
         ErrorTypes.VALIDATION
       );
     }
@@ -451,10 +450,10 @@ export async function deleteUserLevelData(client, guildId, userId) {
     const key = getUserLevelKey(guildId, userId);
     await client.db.delete(key);
     
-    logger.debug(`Deleted level data for user ${userId} in guild ${guildId}`);
+    logger.debug(`Données de niveau supprimées pour l'utilisateur ${userId} sur le serveur ${guildId}`);
   } catch (error) {
-    logger.error(`Error deleting level data for user ${userId}:`, error);
+    logger.error(`Erreur lors de la suppression des données de niveau pour l'utilisateur ${userId} :`, error);
     if (error instanceof TitanBotError) throw error;
-    logger.warn(`Could not delete level data for user ${userId} in guild ${guildId}`);
+    logger.warn(`Impossible de supprimer les données de niveau pour l'utilisateur ${userId} sur le serveur ${guildId}`);
   }
 }
