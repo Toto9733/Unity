@@ -30,14 +30,17 @@ export default {
 
       logger.debug(`Message received from ${message.author.tag}: ${message.content}`);
 
+      // 1. On traite l'XP en premier pour que tous les messages (y compris le comptage) donnent de l'XP
+      await handleLeveling(message, client);
+
+      // 2. Ensuite on gère le jeu de comptage
       const countingProcessed = await handleCountingGame(message, client);
       if (countingProcessed) {
         return;
       }
 
+      // 3. Enfin on gère les commandes textuelles (préfixe)
       await handlePrefixCommand(message, client);
-
-      await handleLeveling(message, client);
     } catch (error) {
       logger.error('Error in messageCreate event:', error);
     }
