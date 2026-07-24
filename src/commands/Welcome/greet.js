@@ -6,20 +6,21 @@ import greetDashboard from './modules/greet_dashboard.js';
 
 export default {
     slashOnly: true,
+    category: 'Configuration',
     data: new SlashCommandBuilder()
         .setName('greet')
-        .setDescription('Manage welcome & goodbye settings')
+        .setDescription('Gérer les paramètres de bienvenue et de départ')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         .addSubcommand(subcommand =>
             subcommand
                 .setName('dashboard')
-                .setDescription('Open the welcome & goodbye configuration dashboard'),
+                .setDescription('Ouvrir le tableau de bord de configuration des messages de bienvenue et de départ'),
         ),
 
     async execute(interaction, config, client) {
         try {
             if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageGuild)) {
-                return await replyUserError(interaction, { type: ErrorTypes.PERMISSION, message: 'You need the **Manage Server** permission to use `/greet`.' });
+                return await replyUserError(interaction, { type: ErrorTypes.PERMISSION, message: 'Vous avez besoin de la permission **Gérer le serveur** pour utiliser `/greet`.' });
             }
 
             const subcommand = interaction.options.getSubcommand();
@@ -28,11 +29,11 @@ export default {
                 case 'dashboard':
                     return await greetDashboard.execute(interaction, config, client);
                 default:
-                    logger.warn(`Unknown /greet subcommand: ${subcommand}`);
+                    logger.warn(`Sous-commande /greet inconnue : ${subcommand}`);
             }
         } catch (error) {
             if (error instanceof TitanBotError) {
-                return await replyUserError(interaction, { type: ErrorTypes.CONFIGURATION, message: error.userMessage || 'Something went wrong.' });
+                return await replyUserError(interaction, { type: ErrorTypes.CONFIGURATION, message: error.userMessage || 'Un problème est survenu.' });
             }
             await handleInteractionError(interaction, error, { command: 'greet' });
         }
