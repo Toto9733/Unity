@@ -7,8 +7,6 @@ import {
     TextInputStyle,
     UserSelectMenuBuilder,
     LabelBuilder,
-    ButtonBuilder,
-    ButtonStyle,
     MessageFlags,
     ComponentType,
     EmbedBuilder,
@@ -19,7 +17,7 @@ import { successEmbed } from '../../../utils/embeds.js';
 import { logger } from '../../../utils/logger.js';
 import { TitanBotError, ErrorTypes, replyUserError } from '../../../utils/errorHandler.js';
 import { getEconomyPrefix } from '../../../utils/database.js';
-import { getEconomyData, addMoney, removeMoney, getMaxBankCapacity } from '../../../utils/economy.js';
+import { addMoney, removeMoney } from '../../../utils/economy.js';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -276,9 +274,14 @@ async function handleAddCurrency(selectInteraction, rootInteraction, guild, clie
 
     if (!submitted) return;
 
-    const userId = submitted.fields.getField('target_user').values[0];
+    const userId = submitted.fields.getUserSelectMenuValue('target_user')?.[0];
     const amount = parseInt(submitted.fields.getTextInputValue('amount').trim(), 10);
     const type = submitted.fields.getTextInputValue('type').trim().toLowerCase();
+
+    if (!userId) {
+        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Please select a target user.' });
+        return;
+    }
 
     if (isNaN(amount) || amount <= 0) {
         await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Amount must be a positive number.' });
@@ -373,9 +376,14 @@ async function handleRemoveCurrency(selectInteraction, rootInteraction, guild, c
 
     if (!submitted) return;
 
-    const userId = submitted.fields.getField('target_user').values[0];
+    const userId = submitted.fields.getUserSelectMenuValue('target_user')?.[0];
     const amount = parseInt(submitted.fields.getTextInputValue('amount').trim(), 10);
     const type = submitted.fields.getTextInputValue('type').trim().toLowerCase();
+
+    if (!userId) {
+        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Please select a target user.' });
+        return;
+    }
 
     if (isNaN(amount) || amount <= 0) {
         await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Amount must be a positive number.' });
@@ -503,7 +511,7 @@ async function handleChangeName(selectInteraction, rootInteraction, guild) {
     const newName = submitted.fields.getTextInputValue('currency_name').trim();
 
     if (newName.length === 0 || newName.length > 20) {
-        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Currency name must be 1-20 characters long.' });
+        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Currency name must be 1-20-characters long.' });
         return;
     }
 
