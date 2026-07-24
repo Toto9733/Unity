@@ -1,3 +1,4 @@
+
 import { Events } from 'discord.js';
 import { logger } from '../utils/logger.js';
 import { getLevelingConfig, getUserLevelData } from '../services/leveling/leveling.js';
@@ -161,7 +162,8 @@ async function handleCountingGame(message, client) {
     const invalidAttempt = !validCount || message.author.id === config.lastUserId;
 
     if (invalidAttempt) {
-      await message.delete().catch(() => {});
+      await message.react('❌').catch(() => {});
+
       await saveCountingGameConfig(client, message.guild.id, {
         ...config,
         nextNumber: 1,
@@ -169,15 +171,13 @@ async function handleCountingGame(message, client) {
         currentStreak: 0,
       });
 
-      const failureMessage = await message.channel.send(`❌ Count broken by <@${message.author.id}>. The sequence has been reset to **1**.`);
-      setTimeout(() => {
-        failureMessage.delete().catch(() => {});
-      }, 10000);
+      await message.channel.send(`❌ Erreur de comptage par <@${message.author.id}> ! Le compteur est réinitialisé à **1**.`);
 
       return true;
     }
 
     await recordCorrectCount(client, message.guild.id, message.author.id);
+    await message.react('✅').catch(() => {});
     return true;
   } catch (error) {
     logger.error('Error handling counting game:', error);
@@ -254,3 +254,5 @@ async function handleLeveling(message, client) {
     logger.error('Error handling leveling for message:', error);
   }
 }
+
+```
