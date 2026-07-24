@@ -2,20 +2,20 @@ import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
 import { logger } from '../../utils/logger.js';
 import { TitanBotError, ErrorTypes } from '../../utils/errorHandler.js';
 import { getUserLevelData, getLevelingConfig, getXpForLevel } from '../../services/leveling/leveling.js';
-
 import { InteractionHelper } from '../../utils/interactionHelper.js';
+
 export default {
   data: new SlashCommandBuilder()
-    .setName('rank')
-    .setDescription("Check your or another user's rank and level")
+    .setName('rang')
+    .setDescription("Vérifie votre rang et niveau ou celui d'un autre utilisateur")
     .addUserOption((option) =>
       option
-        .setName('user')
-        .setDescription('The user to check the rank of')
+        .setName('utilisateur')
+        .setDescription("L'utilisateur dont vous voulez vérifier le rang")
         .setRequired(false)
     )
     .setDMPermission(false),
-  category: 'Leveling',
+  category: 'Niveaux',
 
   async execute(interaction, config, client) {
     await InteractionHelper.safeDefer(interaction);
@@ -26,23 +26,23 @@ export default {
         embeds: [
           new EmbedBuilder()
             .setColor('#f1c40f')
-            .setDescription('The leveling system is currently disabled on this server.')
+            .setDescription('Le système de niveaux est actuellement désactivé sur ce serveur.')
         ],
         flags: MessageFlags.Ephemeral
       });
       return;
     }
 
-    const targetUser = interaction.options.getUser('user') || interaction.user;
+    const targetUser = interaction.options.getUser('utilisateur') || interaction.user;
     const member = await interaction.guild.members
       .fetch(targetUser.id)
       .catch(() => null);
 
     if (!member) {
       throw new TitanBotError(
-        `User ${targetUser.id} not found in guild`,
+        `Utilisateur ${targetUser.id} introuvable sur le serveur`,
         ErrorTypes.USER_INPUT,
-        'Could not find the specified user in this server.'
+        "Impossible de trouver l'utilisateur spécifié sur ce serveur."
       );
     }
 
@@ -59,11 +59,11 @@ export default {
     const progressBar = createProgressBar(progress, 20);
 
     const embed = new EmbedBuilder()
-      .setTitle(`${member.displayName}'s Rank`)
+      .setTitle(`Rang de ${member.displayName}`)
       .setThumbnail(member.displayAvatarURL({ dynamic: true }))
       .addFields(
         {
-          name: 'Level',
+          name: 'Niveau',
           value: safeUserData.level.toString(),
           inline: true
         },
@@ -73,12 +73,12 @@ export default {
           inline: true
         },
         {
-          name: 'Total XP',
+          name: 'XP Totale',
           value: safeUserData.totalXp.toString(),
           inline: true
         },
         {
-          name: `Progress to Level ${safeUserData.level + 1}`,
+          name: `Progression vers le niveau ${safeUserData.level + 1}`,
           value: `${progressBar} ${progress}%`
         }
       )
@@ -86,7 +86,7 @@ export default {
       .setTimestamp();
 
     await InteractionHelper.safeEditReply(interaction, { embeds: [embed] });
-    logger.debug(`Rank checked for user ${targetUser.id} in guild ${interaction.guildId}`);
+    logger.debug(`Vérification du rang pour l'utilisateur ${targetUser.id} sur le serveur ${interaction.guildId}`);
   }
 };
 
