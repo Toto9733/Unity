@@ -15,8 +15,6 @@ import { isCommandEnabled } from '../services/commandAccessService.js';
 import {
   getCountingGameConfig,
   saveCountingGameConfig,
-  isValidCountingMessage,
-  recordCorrectCount,
 } from '../services/countingGameService.js';
 
 const MESSAGE_XP_RATE_LIMIT_ATTEMPTS = 12;
@@ -28,16 +26,16 @@ export default {
     try {
       if (message.author.bot || !message.guild) return;
 
-      logger.debug(`Message received from ${message.author.tag}: ${message.content}`);
+      logger.debug(`Message reçu de ${message.author.tag} : ${message.content}`);
 
-      // 1. On traite l'XP en premier pour que tous les messages (y compris le comptage) donnent de l'XP
-      await handleLeveling(message, client);
-
-      // 2. Ensuite on gère le jeu de comptage
+      // 1. On gère le jeu de comptage en TOUT PREMIER pour éviter qu'il soit bloqué
       const countingProcessed = await handleCountingGame(message, client);
       if (countingProcessed) {
         return;
       }
+
+      // 2. Ensuite on traite l'XP
+      await handleLeveling(message, client);
 
       // 3. Enfin on gère les commandes textuelles (préfixe)
       await handlePrefixCommand(message, client);
@@ -157,10 +155,17 @@ async function handleCountingGame(message, client) {
     }
 
     const content = message.content.trim();
-    const validCount = isValidCountingMessage(content, config);
-    const invalidAttempt = !validCount || message.author.id === config.lastUserId;
+    const number = parseInt(content, 10);
 
-    if (invalidAttempt) {
+    if (isNaN(number)) {
+      return false;
+    }
+
+    const expectedNumber = config.nextNumber ?? 1;
+    const isCorrectNumber = (number === expectedNumber);
+    const isDifferentUser = (message.author.id !== config.lastUserId);
+
+    if (!isCorrectNumber || (!isDifferentUser && config.lastUserId !== null)) {
       await message.react('❌').catch(() => {});
 
       await saveCountingGameConfig(client, message.guild.id, {
@@ -170,12 +175,22 @@ async function handleCountingGame(message, client) {
         currentStreak: 0,
       });
 
-      await message.channel.send(`❌ Erreur de comptage par <@${message.author.id}> ! Le compteur est réinitialisé à **1**.`);
+      const raison = !isCorrectNumber 
+        ? `ce n'est pas le bon nombre (attendu : **${expectedNumber}**)` 
+        : "tu ne peux pas compter deux fois d'affilée";
 
+      await message.channel.send(`❌ Erreur de comptage par <@${message.author.id}> (${raison}) ! Le compteur est réinitialisé à **1**.`);
       return true;
     }
 
-    await recordCorrectCount(client, message.guild.id, message.author.id);
+    await saveCountingGameConfig(client, message.guild.id, {
+      ...config,
+      nextNumber: expectedNumber + 1,
+      lastUserId: message.author.id,
+      currentStreak: (config.currentStreak || 0) + 1,
+      bestStreak: Math.max(config.bestStreak || 0, (config.currentStreak || 0) + 1)
+    });
+
     await message.react('✅').catch(() => {});
     return true;
   } catch (error) {
