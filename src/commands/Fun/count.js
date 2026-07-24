@@ -1,3 +1,4 @@
+
 import { SlashCommandBuilder, PermissionFlagsBits, ChannelType, MessageFlags } from 'discord.js';
 import { createEmbed, successEmbed, infoEmbed } from '../../utils/embeds.js';
 import { InteractionHelper } from '../../utils/interactionHelper.js';
@@ -93,7 +94,7 @@ export default {
                     embeds: [
                         successEmbed(
                             'Jeu de comptage activé',
-                            `Le jeu de comptage est désormais actif dans ${channel} en utilisant le système **${getCountingSystemLabel(system)}**. Les joueurs doivent compter à partir de **1** et ne peuvent pas poster deux nombres d'affilée.`,
+                            `Le jeu de comptage est désormais actif dans ${channel} en utilisant le système **${getCountingSystemLabel(system)}**. Les joueurs doivent compter à partir de **1** (sans suppression de message en cas d'erreur, avec annonces aux paliers 10, 50, 100 et 1000 vainqueur).`,
                         ),
                     ],
                 });
@@ -174,3 +175,5 @@ export default {
         }
     },
 };
+
+
