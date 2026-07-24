@@ -7,11 +7,11 @@ import { InteractionHelper } from '../../utils/interactionHelper.js';
 export default {
     data: new SlashCommandBuilder()
         .setName('deposit')
-        .setDescription('Deposit money from your wallet into your bank')
+        .setDescription("Déposer de l'argent de votre portefeuille vers votre banque")
         .addStringOption(option =>
             option
                 .setName('amount')
-                .setDescription('Amount to deposit (number or "all")')
+                .setDescription('Montant à déposer (nombre ou "all")')
                 .setRequired(true)
         ),
 
@@ -29,7 +29,7 @@ export default {
                 throw createError(
                     "Failed to load economy data",
                     ErrorTypes.DATABASE,
-                    "Failed to load your economy data. Please try again later.",
+                    "Échec du chargement de vos données économiques. Veuillez réessayer plus tard.",
                     { userId, guildId }
                 );
             }
@@ -46,7 +46,7 @@ export default {
                     throw createError(
                         "Invalid deposit amount",
                         ErrorTypes.VALIDATION,
-                        `Please enter a valid number or 'all'. You entered: \`${amountInput}\``,
+                        `Veuillez entrer un nombre valide ou 'all'. Vous avez entré : \`${amountInput}\``,
                         { amountInput, userId }
                     );
                 }
@@ -56,7 +56,7 @@ export default {
                 throw createError(
                     "Zero deposit amount",
                     ErrorTypes.VALIDATION,
-                    "You have no cash to deposit.",
+                    "Vous n'avez pas d'argent liquide à déposer.",
                     { userId, walletBalance: userData.wallet }
                 );
             }
@@ -67,7 +67,7 @@ export default {
                     embeds: [
                         buildUserErrorEmbed(
                             'validation',
-                            `You tried to deposit more than you have. Depositing your remaining cash: **$${depositAmount.toLocaleString()}**`
+                            `Vous avez essayé de déposer plus que ce que vous possédez. Dépôt de votre argent restant : **$${depositAmount.toLocaleString()}**`
                         )
                     ],
                     flags: MessageFlags.Ephemeral,
@@ -80,13 +80,12 @@ export default {
                 throw createError(
                     "Bank is full",
                     ErrorTypes.VALIDATION,
-                    `Your bank is currently full (Max Capacity: $${maxBank.toLocaleString()}). Purchase a **Bank Upgrade** to increase your limit.`,
+                    `Votre banque est actuellement pleine (Capacité max : $${maxBank.toLocaleString()}). Achetez une **Amélioration de banque** pour augmenter votre limite.`,
                     { maxBank, currentBank: userData.bank, userId }
                 );
             }
 
             if (depositAmount > availableSpace) {
-                const originalDepositAmount = depositAmount;
                 depositAmount = availableSpace;
 
                 if (amountInput.toLowerCase() !== "all") {
@@ -94,7 +93,7 @@ export default {
                         embeds: [
                             buildUserErrorEmbed(
                                 'validation',
-                                `You only had space for **$${depositAmount.toLocaleString()}** in your bank account (Max: $${maxBank.toLocaleString()}). The rest remains in your cash.`
+                                `Vous n'aviez de la place que pour **$${depositAmount.toLocaleString()}** dans votre compte bancaire (Max : $${maxBank.toLocaleString()}). Le reste reste dans votre portefeuille.`
                             )
                         ],
                         flags: MessageFlags.Ephemeral,
@@ -106,7 +105,7 @@ export default {
                 throw createError(
                     "No space or cash for deposit",
                     ErrorTypes.VALIDATION,
-                    "The amount you tried to deposit was either 0 or exceeded your bank capacity after checking your cash balance.",
+                    "Le montant que vous avez essayé de déposer était soit de 0, soit dépassait la capacité de votre banque après vérification de votre solde en espèces.",
                     { depositAmount, availableSpace, walletBalance: userData.wallet }
                 );
             }
@@ -117,17 +116,17 @@ export default {
             await setEconomyData(client, guildId, userId, userData);
 
             const embed = successEmbed(
-                'Deposit Successful',
-                `You successfully deposited **$${depositAmount.toLocaleString()}** into your bank.`
+                'Dépôt réussi',
+                `Vous avez déposé avec succès **$${depositAmount.toLocaleString()}** dans votre banque.`
             )
                 .addFields(
                     {
-                        name: "New Cash Balance",
+                        name: "Nouveau solde en espèces",
                         value: `$${userData.wallet.toLocaleString()}`,
                         inline: true,
                     },
                     {
-                        name: "New Bank Balance",
+                        name: "Nouveau solde bancaire",
                         value: `$${userData.bank.toLocaleString()} / $${maxBank.toLocaleString()}`,
                         inline: true,
                     },
