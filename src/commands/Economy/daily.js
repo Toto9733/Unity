@@ -15,7 +15,7 @@ const PREMIUM_BONUS_PERCENTAGE = 0.1;
 export default {
     data: new SlashCommandBuilder()
         .setName('daily')
-        .setDescription('Claim your daily cash reward'),
+        .setDescription("Récupérez votre récompense en espèces quotidienne"),
 
     execute: withErrorHandling(async (interaction, config, client) => {
         const deferred = await InteractionHelper.safeDefer(interaction);
@@ -25,7 +25,7 @@ export default {
             const guildId = interaction.guildId;
             const now = Date.now();
 
-            logger.debug(`[ECONOMY] Daily claimed started for ${userId}`, { userId, guildId });
+            logger.debug(`[ECONOMY] Récompense quotidienne démarrée pour ${userId}`, { userId, guildId });
 
             const userData = await getEconomyData(client, guildId, userId);
             
@@ -33,7 +33,7 @@ export default {
                 throw createError(
                     "Failed to load economy data for daily",
                     ErrorTypes.DATABASE,
-                    "Failed to load your economy data. Please try again later.",
+                    "Échec du chargement de vos données économiques. Veuillez réessayer plus tard.",
                     { userId, guildId }
                 );
             }
@@ -45,7 +45,7 @@ export default {
                 throw createError(
                     "Daily cooldown active",
                     ErrorTypes.RATE_LIMIT,
-                    `You need to wait before claiming daily again. Try again in **${formatDuration(timeRemaining)}**.`,
+                    `Vous devez attendre avant de récupérer votre récompense quotidienne à nouveau. Réessayez dans **${formatDuration(timeRemaining)}**.`,
                     { timeRemaining, cooldownType: 'daily' }
                 );
             }
@@ -66,7 +66,7 @@ export default {
                     DAILY_AMOUNT * PREMIUM_BONUS_PERCENTAGE,
                 );
                 earned += bonusAmount;
-                bonusMessage = `\n✨ **Premium Bonus:** +$${bonusAmount.toLocaleString()}`;
+                bonusMessage = `\n✨ **Bonus Premium :** +$${bonusAmount.toLocaleString()}`;
                 hasPremiumRole = true;
             }
 
@@ -75,7 +75,7 @@ export default {
 
             await setEconomyData(client, guildId, userId, userData);
 
-            logger.info(`[ECONOMY_TRANSACTION] Daily claimed`, {
+            logger.info(`[ECONOMY_TRANSACTION] Quotidien récupéré`, {
                 userId,
                 guildId,
                 amount: earned,
@@ -85,18 +85,19 @@ export default {
             });
 
             const embed = successEmbed(
-                "✅ Daily Claimed!",
-                `You have claimed your daily **$${earned.toLocaleString()}**!${bonusMessage}`
+                "✅ Récompense quotidienne récupérée !",
+                `Vous avez récupéré votre récompense quotidienne de **$${earned.toLocaleString()}** !${bonusMessage}`
             )
                 .addFields({
-                    name: "New Cash Balance",
+                    name: "Nouveau solde en espèces",
                     value: `$${userData.wallet.toLocaleString()}`,
                     inline: true,
                 })
                 .setFooter({
                     text: hasPremiumRole
-                        ? `Next claim in 24 hours. (Premium Active)`
-                        : `Next claim in 24 hours.`,
+                        .valueOf()
+                        ? `Prochaine réclamation dans 24 heures. (Premium actif)`
+                        : `Prochaine réclamation dans 24 heures.`,
                 });
 
             await InteractionHelper.safeEditReply(interaction, { embeds: [embed] });
