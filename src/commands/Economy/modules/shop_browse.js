@@ -1,4 +1,4 @@
-```javascript
+
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder, MessageFlags } from 'discord.js';
 import { shopItems } from '../../../config/shop/items.js';
 import { getColor, BotConfig } from '../../../config/bot.js';
