@@ -1,4 +1,3 @@
-
 import { Events } from 'discord.js';
 import { logger } from '../utils/logger.js';
 import { getLevelingConfig, getUserLevelData } from '../services/leveling/leveling.js';
@@ -243,7 +242,7 @@ async function handleLeveling(message, client) {
       finalXP = Math.floor(finalXP * levelingConfig.xpMultiplier);
     }
 
-    const result = await addXp(client, message.guild, message.member, finalXP);
+    const result = await addXp(client, message.guild.id, message.author.id, finalXP);
 
     if (result?.leveledUp) {
       logger.info(
@@ -254,5 +253,4 @@ async function handleLeveling(message, client) {
     logger.error('Error handling leveling for message:', error);
   }
 }
-
 ```
