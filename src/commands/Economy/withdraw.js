@@ -6,12 +6,12 @@ import { withErrorHandling, createError, ErrorTypes } from '../../utils/errorHan
 import { InteractionHelper } from '../../utils/interactionHelper.js';
 export default {
     data: new SlashCommandBuilder()
-        .setName('withdraw')
-        .setDescription('Withdraw money from your bank to your wallet')
+        .setName('retirer')
+        .setDescription('Retirer de l\'argent de votre banque vers votre portefeuille')
         .addIntegerOption(option =>
             option
-                .setName('amount')
-                .setDescription('Amount to withdraw')
+                .setName('montant')
+                .setDescription('Montant à retirer')
                 .setRequired(true)
                 .setMinValue(1)
         ),
@@ -21,7 +21,7 @@ export default {
             
             const userId = interaction.user.id;
             const guildId = interaction.guildId;
-            const amountInput = interaction.options.getInteger("amount");
+            const amountInput = interaction.options.getInteger("montant");
 
             const userData = await getEconomyData(client, guildId, userId);
             
@@ -29,7 +29,7 @@ export default {
                 throw createError(
                     "Failed to load economy data",
                     ErrorTypes.DATABASE,
-                    "Failed to load your economy data. Please try again later.",
+                    "Impossible de charger vos données économiques. Veuillez réessayer plus tard.",
                     { userId, guildId }
                 );
             }
@@ -40,7 +40,7 @@ export default {
                 throw createError(
                     "Invalid withdrawal amount",
                     ErrorTypes.VALIDATION,
-                    "You must withdraw a positive amount.",
+                    "Vous devez retirer un montant positif.",
                     { amount: withdrawAmount, userId }
                 );
             }
@@ -53,7 +53,7 @@ export default {
                 throw createError(
                     "Empty bank account",
                     ErrorTypes.VALIDATION,
-                    "Your bank account is empty.",
+                    "Votre compte bancaire est vide.",
                     { userId, bankBalance: userData.bank }
                 );
             }
@@ -64,22 +64,22 @@ export default {
             await setEconomyData(client, guildId, userId, userData);
 
             const embed = successEmbed(
-                'Withdrawal Successful',
-                `You successfully withdrew **$${withdrawAmount.toLocaleString()}** from your bank.`
+                'Retrait réussi',
+                `Vous avez retiré avec succès **${withdrawAmount.toLocaleString()}** pièces de votre banque.`
             )
                 .addFields(
                     {
-                        name: "New Cash Balance",
-                        value: `$${userData.wallet.toLocaleString()}`,
+                        name: "Nouveau solde en espèces",
+                        value: `${userData.wallet.toLocaleString()} pièces`,
                         inline: true,
                     },
                     {
-                        name: "New Bank Balance",
-                        value: `$${userData.bank.toLocaleString()}`,
+                        name: "Nouveau solde bancaire",
+                        value: `${userData.bank.toLocaleString()} pièces`,
                         inline: true,
                     },
                 );
 
             await InteractionHelper.safeEditReply(interaction, { embeds: [embed] });
-    }, { command: 'withdraw' })
+    }, { command: 'retirer' })
 };
