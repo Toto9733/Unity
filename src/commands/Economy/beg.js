@@ -12,7 +12,7 @@ const SUCCESS_CHANCE = 0.7;
 
 export default {
     data: new SlashCommandBuilder()
-        .setName('beg')
+        .setName('mendier')
         .setDescription("Mendier pour une petite somme d'argent"),
 
     execute: withErrorHandling(async (interaction, config, client) => {
