@@ -9,11 +9,11 @@ const JAIL_TIME = 2 * 60 * 60 * 1000;
 const FINE_RATE = 0.2;
 
 const CRIME_TYPES = [
-    { name: "Pickpocketing", min: 100, max: 500, risk: 0.3 },
-    { name: "Burglary", min: 300, max: 1000, risk: 0.4 },
-    { name: "Bank Heist", min: 1000, max: 5000, risk: 0.6 },
-    { name: "Art Theft", min: 2000, max: 10000, risk: 0.7 },
-    { name: "Cybercrime", min: 5000, max: 20000, risk: 0.8 },
+    { name: "Vol à la tire", min: 100, max: 500, risk: 0.3 },
+    { name: "Cambriolage", min: 300, max: 1000, risk: 0.4 },
+    { name: "Braquage de banque", min: 1000, max: 5000, risk: 0.6 },
+    { name: "Vol d'art", min: 2000, max: 10000, risk: 0.7 },
+    { name: "Cybercriminalité", min: 5000, max: 20000, risk: 0.8 },
 ];
 
 export default {
@@ -26,11 +26,11 @@ export default {
                 .setDescription('Type de crime à commettre')
                 .setRequired(true)
                 .addChoices(
-                    { name: 'Pickpocketing', value: 'pickpocketing' },
-                    { name: 'Burglary', value: 'burglary' },
-                    { name: 'Bank Heist', value: 'bank-heist' },
-                    { name: 'Art Theft', value: 'art-theft' },
-                    { name: 'Cybercrime', value: 'cybercrime' },
+                    { name: 'Vol à la tire', value: 'vol-a-la-tire' },
+                    { name: 'Cambriolage', value: 'cambriolage' },
+                    { name: 'Braquage de banque', value: 'braquage-de-banque' },
+                    { name: 'Vol d\'art', value: 'vol-dart' },
+                    { name: 'Cybercriminalité', value: 'cybercriminalite' },
                 )
         ),
 
@@ -67,7 +67,7 @@ export default {
 
             const crimeType = interaction.options.getString("type").toLowerCase();
             const crime = CRIME_TYPES.find(
-                c => c.name.toLowerCase().replace(/\s+/g, '-') === crimeType
+                c => c.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/['\s]+/g, '-') === crimeType
             );
 
             if (!crime) {
@@ -94,12 +94,11 @@ export default {
                 
                 const embed = successEmbed(
                     "🕵️ Crime réussi !",
-                    `Vous avez commis avec succès un ${crime.name} et a gagné **${amountEarned.toLocaleString()}** pièces !`
+                    `Vous avez commis avec succès un(e) **${crime.name.toLowerCase()}** et avez gagné **${amountEarned.toLocaleString()}** pièces !`
                 );
                 
                 await InteractionHelper.safeEditReply(interaction, { embeds: [embed] });
             } else {
-                // Fine is based on the potential haul of the attempted crime
                 const potentialHaul = Math.floor((crime.min + crime.max) / 2);
                 const fine = Math.min(Math.floor(potentialHaul * FINE_RATE), userData.wallet || 0);
                 userData.wallet = Math.max(0, (userData.wallet || 0) - fine);
@@ -109,7 +108,7 @@ export default {
                 
                 const embed = warningEmbed(
                     "🚔 Crime échoué !",
-                    `Vous vous êtes fait attraper en tentant un ${crime.name} et avez été envoyé en prison ! ` +
+                    `Vous vous êtes fait attraper en tentant un(e) **${crime.name.toLowerCase()}** et avez été envoyé en prison ! ` +
                     `Vous avez reçu une amende de ${fine.toLocaleString()} pièces et resterez en prison pendant 2 heures.`
                 );
                 
