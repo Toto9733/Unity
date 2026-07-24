@@ -8,7 +8,7 @@ import { getEconomyPrefix } from '../../utils/database.js';
 export default {
     data: new SlashCommandBuilder()
         .setName("eleaderboard")
-        .setDescription("View the server's top 10 richest users.")
+        .setDescription("Afficher le classement des 10 utilisateurs les plus riches du serveur.")
         .setDMPermission(false),
 
     execute: withErrorHandling(async (interaction, config, client) => {
@@ -17,7 +17,7 @@ export default {
 
             const guildId = interaction.guildId;
 
-            logger.debug(`[ECONOMY] Leaderboard requested`, { guildId });
+            logger.debug(`[ECONOMY] Classement demandé`, { guildId });
 
             const prefix = getEconomyPrefix(guildId);
 
@@ -31,7 +31,7 @@ export default {
                 throw createError(
                     "No economy data found",
                     ErrorTypes.VALIDATION,
-                    "No economy data found for this server."
+                    "Aucune donnée économique trouvée pour ce serveur."
                 );
             }
 
@@ -68,7 +68,7 @@ export default {
                 );
             }
 
-            logger.info(`[ECONOMY] Leaderboard generated`, { 
+            logger.info(`[ECONOMY] Classement généré`, { 
                 guildId, 
                 userCount: allUserData.length,
                 userRank 
@@ -76,12 +76,12 @@ export default {
 
             const description = leaderboardEntries.length > 0
                 ? leaderboardEntries.join("\n")
-                : "No economy data is available for this server yet.";
+                : "Aucune donnée économique n'est encore disponible pour ce serveur.";
 
             const embed = createEmbed({
-                title: `Economy Leaderboard`,
+                title: `Classement économique`,
                 description,
-                footer: `Your Rank: ${userRank > 0 ?`#${userRank}`: "No ranking data available"}`,
+                footer: `Votre rang : ${userRank > 0 ? `#${userRank}` : "Aucune donnée de classement disponible"}`,
             });
 
             await InteractionHelper.safeEditReply(interaction, { embeds: [embed] });
