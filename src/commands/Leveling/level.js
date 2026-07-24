@@ -10,7 +10,7 @@ import levelDashboard from './modules/level_dashboard.js';
 
 export default {
     data: new SlashCommandBuilder()
-        .setName('niveau')
+        .setName('level')
         .setDescription('Gérer le système de niveaux')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         .setDMPermission(false)
