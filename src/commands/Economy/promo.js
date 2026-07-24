@@ -1,8 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { createEmbed, successEmbed } from '../../utils/embeds.js';
 import { replyUserError, ErrorTypes } from '../../utils/errorHandler.js';
-// Importe ici ta fonction pour ajouter de l'argent aux utilisateurs (ex: addBalance)
-// import { addBalance } from '../../services/economyService.js';
+import EconomyService from '../../services/economyService.js';
 
 export default {
     data: new SlashCommandBuilder()
@@ -23,8 +22,9 @@ export default {
             const codeInput = interaction.options.getString('code').trim().toLowerCase();
             const userId = interaction.user.id;
             const guildId = interaction.guildId;
+            const client = interaction.client;
 
-            // Définis tes codes valides ici (tu pourras les stocker en base de données plus tard)
+            // Définis tes codes valides et leurs montants ici
             const validCodes = {
                 'unity': 10000,
             };
@@ -38,8 +38,8 @@ export default {
 
             const reward = validCodes[codeInput];
 
-            // TODO: Ajoute ici l'appel à ta fonction d'économie pour créditer l'utilisateur
-            // await addBalance(guildId, userId, reward);
+            // Utilise la méthode addMoney de ton service d'économie
+            await EconomyService.addMoney(client, guildId, userId, reward, 'promo_code_' + codeInput);
 
             return await interaction.editReply({
                 embeds: [
@@ -53,7 +53,7 @@ export default {
             console.error('Erreur lors de la commande promo :', error);
             return await replyUserError(interaction, {
                 type: ErrorTypes.UNKNOWN,
-                message: 'Une erreur est survenue lors de l\'utilisation du code promo.',
+                message: error.userMessage || 'Une erreur est survenue lors de l\'utilisation du code promo.',
             });
         }
     },
