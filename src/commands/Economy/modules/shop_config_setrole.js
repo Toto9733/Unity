@@ -1,4 +1,4 @@
-```javascript
+
 import { PermissionsBitField } from 'discord.js';
 import { successEmbed } from '../../../utils/embeds.js';
 import { getGuildConfig, setGuildConfig } from '../../../services/config/guildConfig.js';
