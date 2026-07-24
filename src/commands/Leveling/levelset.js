@@ -4,28 +4,28 @@ import { TitanBotError, ErrorTypes } from '../../utils/errorHandler.js';
 import { checkUserPermissions } from '../../utils/permissionGuard.js';
 import { setUserLevel, getLevelingConfig } from '../../services/leveling/leveling.js';
 import { createEmbed } from '../../utils/embeds.js';
-
 import { InteractionHelper } from '../../utils/interactionHelper.js';
+
 export default {
   data: new SlashCommandBuilder()
-    .setName('levelset')
-    .setDescription("Set a user's level to a specific value")
+    .setName('niveaudefinir')
+    .setDescription("Définit le niveau d'un utilisateur à une valeur spécifique")
     .addUserOption((option) =>
       option
-        .setName('user')
-        .setDescription('The user to set the level for')
+        .setName('utilisateur')
+        .setDescription("L'utilisateur dont il faut définir le niveau")
         .setRequired(true)
     )
     .addIntegerOption((option) =>
       option
-        .setName('level')
-        .setDescription('The level to set')
+        .setName('niveau')
+        .setDescription('Le niveau à attribuer')
         .setRequired(true)
         .setMinValue(0)
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .setDMPermission(false),
-  category: 'Leveling',
+  category: 'Niveaux',
 
   async execute(interaction, config, client) {
     await InteractionHelper.safeDefer(interaction);
@@ -33,7 +33,7 @@ export default {
     const hasPermission = await checkUserPermissions(
       interaction,
       PermissionFlagsBits.ManageGuild,
-      'You need ManageGuild permission to use this command.'
+      "Vous avez besoin de la permission Gérer le serveur pour utiliser cette commande."
     );
     if (!hasPermission) return;
 
@@ -43,22 +43,22 @@ export default {
         embeds: [
           new EmbedBuilder()
             .setColor('#f1c40f')
-            .setDescription('The leveling system is currently disabled on this server.')
+            .setDescription('Le système de niveaux est actuellement désactivé sur ce serveur.')
         ],
         flags: MessageFlags.Ephemeral
       });
       return;
     }
 
-    const targetUser = interaction.options.getUser('user');
-    const newLevel = interaction.options.getInteger('level');
+    const targetUser = interaction.options.getUser('utilisateur');
+    const newLevel = interaction.options.getInteger('niveau');
 
     const member = await interaction.guild.members.fetch(targetUser.id).catch(() => null);
     if (!member) {
       throw new TitanBotError(
-        `User ${targetUser.id} not found in this guild`,
+        `Utilisateur ${targetUser.id} introuvable sur ce serveur`,
         ErrorTypes.USER_INPUT,
-        'The specified user is not in this server.'
+        "L'utilisateur spécifié n'est pas sur ce serveur."
       );
     }
 
@@ -67,15 +67,15 @@ export default {
     await InteractionHelper.safeEditReply(interaction, {
       embeds: [
         createEmbed({
-          title: 'Level Set',
-          description: `Successfully set ${targetUser.tag}'s level to **${newLevel}**.\n**Total XP:** ${userData.totalXp}`,
+          title: 'Niveau modifié',
+          description: `Le niveau de ${targetUser.tag} a été défini avec succès à **${newLevel}**.\n**XP Totale :** ${userData.totalXp}`,
           color: 'success'
         })
       ]
     });
 
     logger.info(
-      `[ADMIN] User ${interaction.user.tag} set ${targetUser.tag}'s level to ${newLevel} in guild ${interaction.guildId}`
+      `[ADMIN] L'utilisateur ${interaction.user.tag} a défini le niveau de ${targetUser.tag} à ${newLevel} sur le serveur ${interaction.guildId}`
     );
   }
 };
