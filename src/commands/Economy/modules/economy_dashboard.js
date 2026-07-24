@@ -50,49 +50,49 @@ async function buildDashboardEmbed(guild, client) {
             }
         }
     } catch (error) {
-        logger.error('Error calculating economy stats:', error);
+        logger.error('Erreur lors du calcul des statistiques de l\'économie :', error);
     }
 
     const avgBalance = userCount > 0 ? Math.floor(totalInCirculation / userCount) : 0;
 
     return new EmbedBuilder()
-        .setTitle('💰 Economy Dashboard')
-        .setDescription(`Manage the economy system for **${guild.name}**.\nSelect an option below to perform an action.`)
+        .setTitle('💰 Tableau de bord de l\'économie')
+        .setDescription(`Gère le système d'économie pour **${guild.name}**.\nSélectionne une option ci-dessous pour effectuer une action.`)
         .setColor(getColor('economy'))
         .addFields(
-            { name: '💰 Total in Circulation', value: `\`${currencySymbol}${totalInCirculation.toLocaleString()}\``, inline: true },
-            { name: '👥 Active Users', value: `\`${userCount.toLocaleString()}\``, inline: true },
-            { name: '📊 Average Balance', value: `\`${currencySymbol}${avgBalance.toLocaleString()}\``, inline: true },
-            { name: '💱 Currency Symbol', value: `\`${currencySymbol}\``, inline: true },
-            { name: '📝 Currency Name', value: `\`${currencyName}\``, inline: true },
+            { name: '💰 Total en circulation', value: `\`${currencySymbol}${totalInCirculation.toLocaleString()}\``, inline: true },
+            { name: '👥 Utilisateurs actifs', value: `\`${userCount.toLocaleString()}\``, inline: true },
+            { name: '📊 Solde moyen', value: `\`${currencySymbol}${avgBalance.toLocaleString()}\``, inline: true },
+            { name: '💱 Symbole de la monnaie', value: `\`${currencySymbol}\``, inline: true },
+            { name: '📝 Nom de la monnaie', value: `\`${currencyName}\``, inline: true },
         )
-        .setFooter({ text: 'Dashboard closes after 10 minutes of inactivity' })
+        .setFooter({ text: 'Le tableau de bord se ferme après 10 minutes d\'inactivité' })
         .setTimestamp();
 }
 
 function buildSelectMenu(guildId) {
     return new StringSelectMenuBuilder()
         .setCustomId(`economy_dashboard_${guildId}`)
-        .setPlaceholder('Select an action...')
+        .setPlaceholder('Sélectionne une action...')
         .addOptions(
             new StringSelectMenuOptionBuilder()
-                .setLabel('Add Currency')
-                .setDescription('Add currency to a user\'s wallet or bank')
+                .setLabel('Ajouter de la monnaie')
+                .setDescription('Ajouter de la monnaie au portefeuille ou à la banque d\'un utilisateur')
                 .setValue('add_currency')
                 .setEmoji('💰'),
             new StringSelectMenuOptionBuilder()
-                .setLabel('Remove Currency')
-                .setDescription('Remove currency from a user\'s wallet or bank')
+                .setLabel('Retirer de la monnaie')
+                .setDescription('Retirer de la monnaie du portefeuille ou de la banque d\'un utilisateur')
                 .setValue('remove_currency')
                 .setEmoji('💸'),
             new StringSelectMenuOptionBuilder()
-                .setLabel('Change Currency Symbol')
-                .setDescription('Change the currency symbol (e.g., $, €, £)')
+                .setLabel('Changer le symbole de la monnaie')
+                .setDescription('Changer le symbole de la monnaie (ex: $, €, £)')
                 .setValue('change_currency')
                 .setEmoji('💱'),
             new StringSelectMenuOptionBuilder()
-                .setLabel('Change Currency Name')
-                .setDescription('Change the currency name (e.g., coins, credits)')
+                .setLabel('Changer le nom de la monnaie')
+                .setDescription('Changer le nom de la monnaie (ex: pièces, crédits)')
                 .setValue('change_name')
                 .setEmoji('📝'),
         );
@@ -129,10 +129,10 @@ async function updateConfigFile(currencySymbol, currencyName) {
         );
         
         await fs.writeFile(configPath, configContent, 'utf-8');
-        logger.info('Config file updated successfully');
+        logger.info('Fichier de configuration mis à jour avec succès');
         return true;
     } catch (error) {
-        logger.error('Error updating config file:', error);
+        logger.error('Erreur lors de la mise à jour du fichier de configuration :', error);
         return false;
     }
 }
@@ -176,15 +176,15 @@ export default {
                     }
                 } catch (error) {
                     if (error instanceof TitanBotError) {
-                        logger.debug(`Economy dashboard validation error: ${error.message}`);
+                        logger.debug(`Erreur de validation du tableau de bord de l'économie : ${error.message}`);
                     } else {
-                        logger.error('Unexpected economy dashboard error:', error);
+                        logger.error('Erreur inattendue dans le tableau de bord de l\'économie :', error);
                     }
 
                     const errorMessage =
                         error instanceof TitanBotError
-                            ? error.userMessage || 'An error occurred while processing your selection.'
-                            : 'An unexpected error occurred while processing your request.';
+                            ? error.userMessage || 'Une erreur est survenue lors du traitement de votre sélection.'
+                            : 'Une erreur inattendue est survenue lors du traitement de votre demande.';
 
                     if (!selectInteraction.replied && !selectInteraction.deferred) {
                         await selectInteraction.deferUpdate().catch(() => {});
@@ -200,8 +200,8 @@ export default {
             collector.on('end', async (collected, reason) => {
                 if (reason === 'time') {
                     const timeoutEmbed = new EmbedBuilder()
-                        .setTitle('Dashboard Timed Out')
-                        .setDescription('This dashboard has been closed due to inactivity. Please run the command again to continue.')
+                        .setTitle('Tableau de bord expiré')
+                        .setDescription('Ce tableau de bord a été fermé en raison d\'une inactivité. Veuillez relancer la commande pour continuer.')
                         .setColor(getColor('error'));
                     
                     await InteractionHelper.safeEditReply(interaction, {
@@ -212,11 +212,11 @@ export default {
             });
         } catch (error) {
             if (error instanceof TitanBotError) throw error;
-            logger.error('Unexpected error in economy_dashboard:', error);
+            logger.error('Erreur inattendue dans economy_dashboard :', error);
             throw new TitanBotError(
-                `Economy dashboard failed: ${error.message}`,
+                `Échec du tableau de bord de l'économie : ${error.message}`,
                 ErrorTypes.UNKNOWN,
-                'Failed to open the economy dashboard.',
+                'Impossible d\'ouvrir le tableau de bord de l\'économie.',
             );
         }
     },
@@ -225,23 +225,23 @@ export default {
 async function handleAddCurrency(selectInteraction, rootInteraction, guild, client) {
     const modal = new ModalBuilder()
         .setCustomId(`economy_add_currency_${guild.id}`)
-        .setTitle('Add Currency');
+        .setTitle('Ajouter de la monnaie');
 
     const userSelect = new UserSelectMenuBuilder()
         .setCustomId('target_user')
-        .setPlaceholder('Select a user...')
+        .setPlaceholder('Sélectionne un utilisateur...')
         .setMinValues(1)
         .setMaxValues(1)
         .setRequired(true);
 
     const userLabel = new LabelBuilder()
-        .setLabel('Target User')
-        .setDescription('User to add currency to')
+        .setLabel('Utilisateur cible')
+        .setDescription('Utilisateur à qui ajouter de la monnaie')
         .setUserSelectMenuComponent(userSelect);
 
     const amountInput = new TextInputBuilder()
         .setCustomId('amount')
-        .setLabel('Amount to add')
+        .setLabel('Montant à ajouter')
         .setStyle(TextInputStyle.Short)
         .setPlaceholder('100')
         .setMinLength(1)
@@ -250,7 +250,7 @@ async function handleAddCurrency(selectInteraction, rootInteraction, guild, clie
 
     const typeInput = new TextInputBuilder()
         .setCustomId('type')
-        .setLabel('Type (wallet or bank)')
+        .setLabel('Type (wallet ou bank)')
         .setStyle(TextInputStyle.Short)
         .setPlaceholder('wallet')
         .setMinLength(1)
@@ -279,28 +279,28 @@ async function handleAddCurrency(selectInteraction, rootInteraction, guild, clie
     const type = submitted.fields.getTextInputValue('type').trim().toLowerCase();
 
     if (!userId) {
-        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Please select a target user.' });
+        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Veuillez sélectionner un utilisateur cible.' });
         return;
     }
 
     if (isNaN(amount) || amount <= 0) {
-        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Amount must be a positive number.' });
+        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Le montant doit être un nombre positif.' });
         return;
     }
 
     if (type !== 'wallet' && type !== 'bank') {
-        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Type must be either "wallet" or "bank".' });
+        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Le type doit être "wallet" ou "bank".' });
         return;
     }
 
     const member = await guild.members.fetch(userId).catch(() => null);
     if (!member) {
-        await replyUserError(submitted, { type: ErrorTypes.USER_INPUT, message: 'The specified user is not in this server.' });
+        await replyUserError(submitted, { type: ErrorTypes.USER_INPUT, message: 'L\'utilisateur spécifié n\'est pas sur ce serveur.' });
         return;
     }
 
     if (member.user.bot) {
-        await replyUserError(submitted, { type: ErrorTypes.UNKNOWN, message: 'Bots do not have economy accounts.' });
+        await replyUserError(submitted, { type: ErrorTypes.UNKNOWN, message: 'Les bots n\'ont pas de compte d\'économie.' });
         return;
     }
 
@@ -309,11 +309,11 @@ async function handleAddCurrency(selectInteraction, rootInteraction, guild, clie
     const currencySymbol = BotConfig.economy.currency.symbol;
 
     await submitted.reply({
-        embeds: [successEmbed('Currency Added', `Successfully added ${currencySymbol}${amount.toLocaleString()} to ${member.user.tag}'s ${type}.\n**New Balance:** ${currencySymbol}${newBalance.toLocaleString()}`)],
+        embeds: [successEmbed('Monnaie ajoutée', `Ajout réussi de ${currencySymbol}${amount.toLocaleString()} au ${type} de ${member.user.tag}.\n**Nouveau solde :** ${currencySymbol}${newBalance.toLocaleString()}`)],
         flags: MessageFlags.Ephemeral,
     });
 
-    logger.info(`[ECONOMY_DASHBOARD] Currency added`, {
+    logger.info(`[ECONOMY_DASHBOARD] Monnaie ajoutée`, {
         adminId: submitted.user.id,
         targetUserId: userId,
         amount,
@@ -327,23 +327,23 @@ async function handleAddCurrency(selectInteraction, rootInteraction, guild, clie
 async function handleRemoveCurrency(selectInteraction, rootInteraction, guild, client) {
     const modal = new ModalBuilder()
         .setCustomId(`economy_remove_currency_${guild.id}`)
-        .setTitle('Remove Currency');
+        .setTitle('Retirer de la monnaie');
 
     const userSelect = new UserSelectMenuBuilder()
         .setCustomId('target_user')
-        .setPlaceholder('Select a user...')
+        .setPlaceholder('Sélectionne un utilisateur...')
         .setMinValues(1)
         .setMaxValues(1)
         .setRequired(true);
 
     const userLabel = new LabelBuilder()
-        .setLabel('Target User')
-        .setDescription('User to remove currency from')
+        .setLabel('Utilisateur cible')
+        .setDescription('Utilisateur à qui retirer de la monnaie')
         .setUserSelectMenuComponent(userSelect);
 
     const amountInput = new TextInputBuilder()
         .setCustomId('amount')
-        .setLabel('Amount to remove')
+        .setLabel('Montant à retirer')
         .setStyle(TextInputStyle.Short)
         .setPlaceholder('100')
         .setMinLength(1)
@@ -352,7 +352,7 @@ async function handleRemoveCurrency(selectInteraction, rootInteraction, guild, c
 
     const typeInput = new TextInputBuilder()
         .setCustomId('type')
-        .setLabel('Type (wallet or bank)')
+        .setLabel('Type (wallet ou bank)')
         .setStyle(TextInputStyle.Short)
         .setPlaceholder('wallet')
         .setMinLength(1)
@@ -381,28 +381,28 @@ async function handleRemoveCurrency(selectInteraction, rootInteraction, guild, c
     const type = submitted.fields.getTextInputValue('type').trim().toLowerCase();
 
     if (!userId) {
-        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Please select a target user.' });
+        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Veuillez sélectionner un utilisateur cible.' });
         return;
     }
 
     if (isNaN(amount) || amount <= 0) {
-        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Amount must be a positive number.' });
+        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Le montant doit être un nombre positif.' });
         return;
     }
 
     if (type !== 'wallet' && type !== 'bank') {
-        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Type must be either "wallet" or "bank".' });
+        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Le type doit être "wallet" ou "bank".' });
         return;
     }
 
     const member = await guild.members.fetch(userId).catch(() => null);
     if (!member) {
-        await replyUserError(submitted, { type: ErrorTypes.USER_INPUT, message: 'The specified user is not in this server.' });
+        await replyUserError(submitted, { type: ErrorTypes.USER_INPUT, message: 'L\'utilisateur spécifié n\'est pas sur ce serveur.' });
         return;
     }
 
     if (member.user.bot) {
-        await replyUserError(submitted, { type: ErrorTypes.UNKNOWN, message: 'Bots do not have economy accounts.' });
+        await replyUserError(submitted, { type: ErrorTypes.UNKNOWN, message: 'Les bots n\'ont pas de compte d\'économie.' });
         return;
     }
 
@@ -411,11 +411,11 @@ async function handleRemoveCurrency(selectInteraction, rootInteraction, guild, c
     const currencySymbol = BotConfig.economy.currency.symbol;
 
     await submitted.reply({
-        embeds: [successEmbed('Currency Removed', `Successfully removed ${currencySymbol}${amount.toLocaleString()} from ${member.user.tag}'s ${type}.\n**New Balance:** ${currencySymbol}${newBalance.toLocaleString()}`)],
+        embeds: [successEmbed('Monnaie retirée', `Retrait réussi de ${currencySymbol}${amount.toLocaleString()} du ${type} de ${member.user.tag}.\n**Nouveau solde :** ${currencySymbol}${newBalance.toLocaleString()}`)],
         flags: MessageFlags.Ephemeral,
     });
 
-    logger.info(`[ECONOMY_DASHBOARD] Currency removed`, {
+    logger.info(`[ECONOMY_DASHBOARD] Monnaie retirée`, {
         adminId: submitted.user.id,
         targetUserId: userId,
         amount,
@@ -429,11 +429,11 @@ async function handleRemoveCurrency(selectInteraction, rootInteraction, guild, c
 async function handleChangeCurrency(selectInteraction, rootInteraction, guild) {
     const modal = new ModalBuilder()
         .setCustomId(`economy_change_currency_${guild.id}`)
-        .setTitle('Change Currency Symbol');
+        .setTitle('Changer le symbole de la monnaie');
 
     const symbolInput = new TextInputBuilder()
         .setCustomId('currency_symbol')
-        .setLabel('New Currency Symbol')
+        .setLabel('Nouveau symbole de la monnaie')
         .setStyle(TextInputStyle.Short)
         .setValue(BotConfig.economy.currency.symbol)
         .setPlaceholder('$')
@@ -457,23 +457,23 @@ async function handleChangeCurrency(selectInteraction, rootInteraction, guild) {
     const newSymbol = submitted.fields.getTextInputValue('currency_symbol').trim();
 
     if (newSymbol.length === 0 || newSymbol.length > 3) {
-        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Currency symbol must be 1-3 characters long.' });
+        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Le symbole de la monnaie doit contenir entre 1 et 3 caractères.' });
         return;
     }
 
     const success = await updateConfigFile(newSymbol, BotConfig.economy.currency.name);
 
     if (!success) {
-        await replyUserError(submitted, { type: ErrorTypes.UNKNOWN, message: 'Could not update the config file. Please check the logs.' });
+        await replyUserError(submitted, { type: ErrorTypes.UNKNOWN, message: 'Impossible de mettre à jour le fichier de configuration. Veuillez vérifier les logs.' });
         return;
     }
 
     await submitted.reply({
-        embeds: [successEmbed('Currency Symbol Updated', `Currency symbol changed to **${newSymbol}**.\n\n**Note:** The bot needs to be restarted for changes to take effect.`)],
+        embeds: [successEmbed('Symbole de la monnaie mis à jour', `Le symbole de la monnaie a été changé en **${newSymbol}**.\n\n**Remarque :** Le bot doit être redémarré pour que les modifications prennent effet.`)],
         flags: MessageFlags.Ephemeral,
     });
 
-    logger.info(`[ECONOMY_DASHBOARD] Currency symbol changed`, {
+    logger.info(`[ECONOMY_DASHBOARD] Symbole de la monnaie modifié`, {
         adminId: submitted.user.id,
         oldSymbol: BotConfig.economy.currency.symbol,
         newSymbol
@@ -483,14 +483,14 @@ async function handleChangeCurrency(selectInteraction, rootInteraction, guild) {
 async function handleChangeName(selectInteraction, rootInteraction, guild) {
     const modal = new ModalBuilder()
         .setCustomId(`economy_change_name_${guild.id}`)
-        .setTitle('Change Currency Name');
+        .setTitle('Changer le nom de la monnaie');
 
     const nameInput = new TextInputBuilder()
         .setCustomId('currency_name')
-        .setLabel('New Currency Name')
+        .setLabel('Nouveau nom de la monnaie')
         .setStyle(TextInputStyle.Short)
         .setValue(BotConfig.economy.currency.name)
-        .setPlaceholder('coins')
+        .setPlaceholder('pièces')
         .setMinLength(1)
         .setMaxLength(20)
         .setRequired(true);
@@ -511,23 +511,23 @@ async function handleChangeName(selectInteraction, rootInteraction, guild) {
     const newName = submitted.fields.getTextInputValue('currency_name').trim();
 
     if (newName.length === 0 || newName.length > 20) {
-        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Currency name must be 1-20-characters long.' });
+        await replyUserError(submitted, { type: ErrorTypes.VALIDATION, message: 'Le nom de la monnaie doit contenir entre 1 et 20 caractères.' });
         return;
     }
 
     const success = await updateConfigFile(BotConfig.economy.currency.symbol, newName);
 
     if (!success) {
-        await replyUserError(submitted, { type: ErrorTypes.UNKNOWN, message: 'Could not update the config file. Please check the logs.' });
+        await replyUserError(submitted, { type: ErrorTypes.UNKNOWN, message: 'Impossible de mettre à jour le fichier de configuration. Veuillez vérifier les logs.' });
         return;
     }
 
     await submitted.reply({
-        embeds: [successEmbed('Currency Name Updated', `Currency name changed to **${newName}**.\n\n**Note:** The bot needs to be restarted for changes to take effect.`)],
+        embeds: [successEmbed('Nom de la monnaie mis à jour', `Le nom de la monnaie a été changé en **${newName}**.\n\n**Remarque :** Le bot doit être redémarré pour que les modifications prennent effet.`)],
         flags: MessageFlags.Ephemeral,
     });
 
-    logger.info(`[ECONOMY_DASHBOARD] Currency name changed`, {
+    logger.info(`[ECONOMY_DASHBOARD] Nom de la monnaie modifié`, {
         adminId: submitted.user.id,
         oldName: BotConfig.economy.currency.name,
         newName
