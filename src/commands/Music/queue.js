@@ -1,3 +1,4 @@
+
 import { SlashCommandBuilder, MessageFlags } from 'discord.js';
 import { InteractionHelper } from '../../utils/interactionHelper.js';
 import { buildQueueReply } from '../../services/music/musicActions.js';
@@ -7,9 +8,9 @@ export default {
     category: 'Music',
     data: new SlashCommandBuilder()
         .setName('queue')
-        .setDescription('Show the current music queue')
+        .setDescription('Afficher la file d\'attente musicale actuelle')
         .addIntegerOption((opt) =>
-            opt.setName('page').setDescription('Page number').setMinValue(1),
+            opt.setName('page').setDescription('Numéro de page').setMinValue(1),
         ),
 
     async execute(interaction, config, client) {
