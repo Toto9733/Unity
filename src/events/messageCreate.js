@@ -30,14 +30,14 @@ export default {
 
       logger.debug(`Message received from ${message.author.tag}: ${message.content}`);
 
-      // 1. On traite l'XP en premier pour que tous les messages (y compris le comptage) donnent de l'XP
-      await handleLeveling(message, client);
-
-      // 2. Ensuite on gère le jeu de comptage
+      // 1. On gère le jeu de comptage en TOUT PREMIER pour éviter tout blocage
       const countingProcessed = await handleCountingGame(message, client);
       if (countingProcessed) {
         return;
       }
+
+      // 2. Ensuite on traite l'XP
+      await handleLeveling(message, client);
 
       // 3. Enfin on gère les commandes textuelles (préfixe)
       await handlePrefixCommand(message, client);
@@ -253,4 +253,3 @@ async function handleLeveling(message, client) {
     logger.error('Error handling leveling for message:', error);
   }
 }
-```
