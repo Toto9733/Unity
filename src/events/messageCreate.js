@@ -30,19 +30,19 @@ export default {
 
       logger.debug(`Message received from ${message.author.tag}: ${message.content}`);
 
-      // 1. On gère le jeu de comptage en TOUT PREMIER pour éviter tout blocage
+      // 1. On traite l'XP en premier pour que tous les messages (y compris le comptage) donnent de l'XP
+      await handleLeveling(message, client);
+
+      // 2. Ensuite on gère le jeu de comptage
       const countingProcessed = await handleCountingGame(message, client);
       if (countingProcessed) {
         return;
       }
 
-      // 2. Ensuite on traite l'XP
-      await handleLeveling(message, client);
-
       // 3. Enfin on gère les commandes textuelles (préfixe)
       await handlePrefixCommand(message, client);
     } catch (error) {
-      logger.error('Error in messageCreate event:', error);
+      logger.error("Erreur dans l'événement messageCreate :", error);
     }
   }
 };
@@ -65,21 +65,21 @@ async function handlePrefixCommand(message, client) {
       args = [musicPrefixShortcut, ...args];
     }
 
-    logger.info(`Prefix command detected: ${commandName}, args: ${args.join(', ')}`);
+    logger.info(`Commande textuelle détectée : ${commandName}, arguments : ${args.join(', ')}`);
 
     const resolvedCommandName = resolveCommandAlias(commandName);
-    logger.info(`Resolved command name: ${resolvedCommandName}`);
+    logger.info(`Nom de commande résolu : ${resolvedCommandName}`);
     const command = client.commands.get(resolvedCommandName);
 
     if (!command) {
-      logger.warn(`Command not found: ${resolvedCommandName}`);
+      logger.warn(`Commande introuvable : ${resolvedCommandName}`);
       return; 
     }
 
     if (isMaintenanceMode() && !isBotOwner(message.author.id)) {
       await message.channel.send({
         embeds: [createEmbed({
-          title: 'Maintenance Mode',
+          title: 'Mode Maintenance',
           description: getBotMessage('maintenanceMode'),
           color: 'warning',
         })],
@@ -90,7 +90,7 @@ async function handlePrefixCommand(message, client) {
     if (!isCommandCategoryEnabled(command.category)) {
       await message.channel.send({
         embeds: [createEmbed({
-          title: 'Feature Disabled',
+          title: 'Fonctionnalité désactivée',
           description: getBotMessage('commandDisabled'),
           color: 'error',
         })],
@@ -102,8 +102,8 @@ async function handlePrefixCommand(message, client) {
     if (!supportsPrefixExecution(command) || restriction.blocked) {
       if (restriction.blocked && restriction.reason) {
         const embed = createEmbed({
-          title: 'Slash Command Only',
-          description: `${restriction.reason}\nUse \`/${resolvedCommandName}\` instead.`,
+          title: 'Commande Slash Uniquement',
+          description: `${restriction.reason}\nUtilisez \`/${resolvedCommandName}\` à la place.`,
           color: 'info',
         });
         await message.channel.send({ embeds: [embed] }).catch(() => {});
@@ -113,8 +113,8 @@ async function handlePrefixCommand(message, client) {
 
     if (!(await isCommandEnabled(client, message.guild.id, resolvePrefixAccessKey(command.data, args), command.category))) {
       const embed = createEmbed({
-        title: 'Command Disabled',
-        description: 'This command has been disabled for this server.',
+        title: 'Commande désactivée',
+        description: 'Cette commande a été désactivée pour ce serveur.',
         color: 'error',
       });
       await message.channel.send({ embeds: [embed] }).catch(() => {});
@@ -133,19 +133,19 @@ async function handlePrefixCommand(message, client) {
     if (!abuseProtection.allowed) {
       const formattedCooldown = formatCooldownDuration(abuseProtection.remainingMs);
       const embed = createEmbed({
-        title: 'Command Cooldown',
-        description: `This command is on cooldown. Please wait ${formattedCooldown} before trying again.`,
+        title: 'Cooldown de la commande',
+        description: `Cette commande est en cours de rechargement. Veuillez patienter ${formattedCooldown} avant de réessayer.`,
         color: 'error',
       });
       await message.channel.send({ embeds: [embed] }).catch(() => {});
       return;
     }
 
-    logger.info(`Executing prefix command: ${prefix}${commandName} (resolved to ${resolvedCommandName}) by ${message.author.tag}`);
+    logger.info(`Exécution de la commande textuelle : ${prefix}${commandName} (résolue en ${resolvedCommandName}) par ${message.author.tag}`);
     
     await executePrefixCommand(command, message, args, client, prefix, guildConfig);
   } catch (error) {
-    logger.error('Error handling prefix command:', error);
+    logger.error('Erreur lors de la gestion de la commande textuelle :', error);
   }
 }
 
@@ -179,7 +179,7 @@ async function handleCountingGame(message, client) {
     await message.react('✅').catch(() => {});
     return true;
   } catch (error) {
-    logger.error('Error handling counting game:', error);
+    logger.error('Erreur lors de la gestion du jeu de comptage :', error);
     return false;
   }
 }
@@ -246,10 +246,10 @@ async function handleLeveling(message, client) {
 
     if (result?.leveledUp) {
       logger.info(
-        `${message.author.tag} leveled up to level ${result.level} in ${message.guild.name}`
+        `${message.author.tag} est passée au niveau ${result.level} sur ${message.guild.name}`
       );
     }
   } catch (error) {
-    logger.error('Error handling leveling for message:', error);
+    logger.error("Erreur lors de la gestion de l'XP pour le message :", error);
   }
 }
