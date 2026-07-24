@@ -26,7 +26,8 @@ export default {
 
             // Définis tes codes valides et leurs montants ici
             const validCodes = {
-                'unity': 10000,
+                'unity': 10000,'start': 5000,
+                'vip': 20000,
             };
 
             if (!validCodes[codeInput]) {
