@@ -6,7 +6,7 @@ import { InteractionHelper } from '../../utils/interactionHelper.js';
 
 export default {
   data: new SlashCommandBuilder()
-    .setName('classement')
+    .setName('leaderboard')
     .setDescription("Affiche le classement des niveaux du serveur")
     .setDMPermission(false),
   category: 'Niveaux',
