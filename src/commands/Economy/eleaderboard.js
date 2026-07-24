@@ -7,7 +7,7 @@ import { getEconomyPrefix } from '../../utils/database.js';
 
 export default {
     data: new SlashCommandBuilder()
-        .setName("eleaderboard")
+        .setName("classementcasino")
         .setDescription("Afficher le classement des 10 utilisateurs les plus riches du serveur.")
         .setDMPermission(false),
 
@@ -64,7 +64,7 @@ export default {
                 const emoji = rankEmoji[i] || `**#${rank}**`;
 
                 leaderboardEntries.push(
-                    `${emoji} <@${user.userId}> - 🏦 ${user.net_worth.toLocaleString()}`,
+                    `${emoji} <@${user.userId}> - 🏦 ${user.net_worth.toLocaleString()} pièces`,
                 );
             }
 
@@ -79,11 +79,11 @@ export default {
                 : "Aucune donnée économique n'est encore disponible pour ce serveur.";
 
             const embed = createEmbed({
-                title: `Classement économique`,
+                title: `Classement du casino`,
                 description,
                 footer: `Votre rang : ${userRank > 0 ? `#${userRank}` : "Aucune donnée de classement disponible"}`,
             });
 
             await InteractionHelper.safeEditReply(interaction, { embeds: [embed] });
-    }, { command: 'eleaderboard' })
+    }, { command: 'classementcasino' })
 };
