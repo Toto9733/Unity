@@ -7,7 +7,7 @@ export default {
     category: 'Music',
     data: new SlashCommandBuilder()
         .setName('play')
-        .setDescription('Play a song or add it to the queue')
+        .setDescription('Lance un son ou ajoute le dans la file bby')
         .addStringOption((opt) =>
             opt.setName('query').setDescription('Song name or URL').setRequired(true),
         ),
