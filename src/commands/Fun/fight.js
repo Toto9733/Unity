@@ -54,10 +54,10 @@ export default {
       const attacker = rand(0, 1) === 0 ? challenger : opponent;
       const target = attacker.id === challenger.id ? opponent : challenger;
       const action = [
-        "lance un coup de poing sauvage",
-        "inflige un coup critique",
-        "utilise un sort faible",
-        "pare et contre-attaque",
+        "Crache un gros molard",
+        "Lance le Grand Terassement",
+        "Met un doigt dans les fesses",
+        "Retour de bâton clouté dans les fesses",
       ][rand(0, 3)];
       log.push(
         `\n**Round ${i} :** ${attacker.username} ${action} sur ${target.username} pour ${rand(1, damage)} de dégâts !`,
